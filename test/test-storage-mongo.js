@@ -4,7 +4,7 @@ var sinon = require('sinon');
 
 var mongo =  require ('../lib/storage/providers/mongo');
 
-describe.only('mongo storage', function(){
+describe('mongo storage', function(){
   var service;
   var clock;
   var INITIAL_TIME = 946684800;
