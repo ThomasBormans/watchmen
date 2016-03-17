@@ -26,19 +26,20 @@ function run(program, cb){
     return cb('service ID is required');
   }
   var env = program.env || 'development';
-  var storage = storageFactory.getStorageInstance(env);
-  if (!storage){
-    return cb('Invalid storage');
-  }
-
-  var reporter = new reporterFactory(storage);
-  reporter.getService(program.serviceId, function(err, service){
-    if (!service) {
-      return cb('service not found with id ' + program.serviceId);
+  storageFactory.getStorageInstance(env, function(err, storage) {
+    if (err){
+      return cb('Invalid storage');
     }
-    printServiceReport(service);
-    storage.quit();
-    cb();
+
+    var reporter = new reporterFactory(storage);
+    reporter.getService(program.serviceId, function(err, service){
+      if (!service) {
+        return cb('service not found with id ' + program.serviceId);
+      }
+      printServiceReport(service);
+      storage.quit();
+      cb();
+    });
   });
 }
 

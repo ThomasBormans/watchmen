@@ -5,6 +5,8 @@ var storageFactory = require('./lib/storage/storage-factory');
 var WatchMenFactory = require('./lib/watchmen');
 var sentinelFactory = require('./lib/sentinel');
 
+var storageProvider;
+
 var RETURN_CODES = {
   OK: 0,
   BAD_STORAGE: 1,
@@ -12,7 +14,9 @@ var RETURN_CODES = {
 };
 
 function exit(code) {
-  storage.quit();
+  if (storageProvider) {
+    storageProvider.quit();
+  }
   process.exit(code);
 }
 
@@ -21,29 +25,31 @@ program
     .option('-d, --max-initial-delay [value]', 'Initial random delay max bound', 20000)
     .parse(process.argv);
 
-var storage = storageFactory.getStorageInstance(program.env);
-if (!storage) {
-  console.error('Error creating storage for env: ', program.env);
-  return process.exit(RETURN_CODES.BAD_STORAGE);
-}
-
-storage.getServices({}, function (err, services) {
-  if (err) {
-    console.error('error loading services'.red);
-    console.error(err);
-    return exit(RETURN_CODES.GENERIC_ERROR);
+storageFactory.getStorageInstance(program.env, function(err, storage) {
+  if (err || !storage) {
+    console.error('Error creating storage for env: ', program.env);
+    return process.exit(RETURN_CODES.BAD_STORAGE);
   }
 
-  var watchmen = new WatchMenFactory(services, storage);
+  storageProvider = storage;
 
-  pluginLoader.loadPlugins(watchmen, {}, function(){
-    watchmen.startAll({randomDelayOnInit: program.maxInitialDelay});
-    console.log('\nwatchmen has started. ' + services.length + ' services loaded\n');
+  storage.getServices({}, function (err, services) {
+    if (err) {
+      console.error('error loading services'.red);
+      console.error(err);
+      return exit(RETURN_CODES.GENERIC_ERROR);
+    }
 
-    var sentinel = new sentinelFactory(storage, watchmen, {interval: 10000});
-    sentinel.watch();
+    var watchmen = new WatchMenFactory(services, storage);
+
+    pluginLoader.loadPlugins(watchmen, {}, function(){
+      watchmen.startAll({randomDelayOnInit: program.maxInitialDelay});
+      console.log('\nwatchmen has started. ' + services.length + ' services loaded\n');
+
+      var sentinel = new sentinelFactory(storage, watchmen, {interval: 10000});
+      sentinel.watch();
+    });
   });
-
 });
 
 process.on('SIGINT', function () {

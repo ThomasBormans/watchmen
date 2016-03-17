@@ -5,28 +5,28 @@ var services;
 
 function run(program){
   var env = program.env || 'development';
-  var storage = storageFactory.getStorageInstance(env);
-
-  if (!storage) {
-    console.error('Not available storage for the provided environment ' + env);
-    return;
-  }
-
-  if (program.real) {
-    console.log('Populating real services...');
-    services = require('../../test/fixtures/real-services');
-  } else {
-    console.log('Populating real services...');
-    services = dummyServiceGenerator.generate(program.numberServices || 20);
-  }
-
-  populator.populate(services, storage, function(err){
+  storageFactory.getStorageInstance(env, function(err, storage) {
     if (err) {
-      console.error(err);
-    } else {
-      console.log('done! ' + services.length + ' services populated');
+      console.error('Not available storage for the provided environment ' + env);
+      return;
     }
-    storage.quit();
+
+    if (program.real) {
+      console.log('Populating real services...');
+      services = require('../../test/fixtures/real-services');
+    } else {
+      console.log('Populating real services...');
+      services = dummyServiceGenerator.generate(program.numberServices || 20);
+    }
+
+    populator.populate(services, storage, function(err){
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('done! ' + services.length + ' services populated');
+      }
+      storage.quit();
+    });
   });
 }
 

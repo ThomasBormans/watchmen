@@ -14,23 +14,24 @@ program
     .option('-e, --env [env]', 'Storage environment key', process.env.NODE_ENV || 'development')
     .parse(process.argv);
 
-var storage = storageFactory.getStorageInstance(program.env);
-if (!storage) {
-  console.error('Error creating storage for env: ', program.env);
-  return process.exit(RETURN_CODES.BAD_STORAGE);
-}
-
-var app = expressApp(storage);
-var server = app.listen(program.port, function () {
-  if (server.address()) {
-    console.log("watchmen server listening on port %d in %s mode", program.port, program.env);
-  } else {
-    console.log('something went wrong... couldn\'t listen to port %d', program.port);
-    process.exit(RETURN_CODES.BAD_PORT);
+storageFactory.getStorageInstance(program.env, function(err, storage) {
+  if (err || !storage) {
+    console.error('Error creating storage for env: ', program.env);
+    return process.exit(RETURN_CODES.BAD_STORAGE);
   }
-  process.on('SIGINT', function () {
-    console.log('stopping web server.. bye!');
-    server.close();
-    process.exit(RETURN_CODES.OK);
+
+  var app = expressApp(storage);
+  var server = app.listen(program.port, function () {
+    if (server.address()) {
+      console.log("watchmen server listening on port %d in %s mode", program.port, program.env);
+    } else {
+      console.log('something went wrong... couldn\'t listen to port %d', program.port);
+      process.exit(RETURN_CODES.BAD_PORT);
+    }
+    process.on('SIGINT', function () {
+      console.log('stopping web server.. bye!');
+      server.close();
+      process.exit(RETURN_CODES.OK);
+    });
   });
 });
