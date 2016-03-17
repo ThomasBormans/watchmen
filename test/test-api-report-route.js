@@ -23,7 +23,7 @@ describe('report route', function () {
   var agent;
 
   before(function (done) {
-    var storage = storageFactory.getStorageInstance('test', function (err, store) {
+    storageFactory.getStorageInstance('test', function (err, store) {
       if (err) {
         return done(err);
       }
