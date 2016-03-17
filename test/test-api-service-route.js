@@ -6,11 +6,10 @@ var mockPassport = require('passport-mock');
 var storageFactory = require('../lib/storage/storage-factory');
 var superAgentAssertions = require('./lib/util/super-agent-assertions');
 
-var storage = storageFactory.getStorageInstance('test');
-var app = require('../webserver/app')(storage);
-
 describe('service route', function () {
 
+  var storage;
+  var app;
   var server;
   var PORT = 3355;
 
@@ -23,6 +22,17 @@ describe('service route', function () {
 
   var agent = request.agent(app);
   var validService;
+
+  before(function (done) {
+    var storage = storageFactory.getStorageInstance('test', function (err, store) {
+      if (err) {
+        return done(err);
+      }
+      storage = store;
+      app = require('../webserver/app')(storage);
+      done();
+    });
+  });
 
   before(function (done) {
 

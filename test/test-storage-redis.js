@@ -3,13 +3,20 @@ var async = require('async');
 var sinon = require('sinon');
 
 var storageFactory = require ('../lib/storage/storage-factory');
-var redisStorage = storageFactory.getStorageInstance('test');
 
 describe('redis storage', function(){
 
+  var redisStorage;
   var service;
   var clock;
   var INITIAL_TIME = 946684800;
+
+  before(function (done) {
+    var storage = storageFactory.getStorageInstance('test', function (err, store) {
+      redisStorage = store;
+      done(err);
+    });
+  });
 
   beforeEach(function(done){
     clock = sinon.useFakeTimers(INITIAL_TIME);

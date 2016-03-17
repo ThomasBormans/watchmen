@@ -2,12 +2,11 @@ var request = require('supertest');
 var assert = require('assert');
 var storageFactory = require('../lib/storage/storage-factory');
 
-var storage = storageFactory.getStorageInstance('test');
-var app = require('../webserver/app')(storage);
-
 describe('ping plugins route', function () {
 
   var server;
+  var storage;
+  var app;
   var PORT = 3355;
 
   var API_ROOT = '/api/plugins';
@@ -15,7 +14,17 @@ describe('ping plugins route', function () {
   var agent = request.agent(app);
 
   before(function (done) {
+    var storage = storageFactory.getStorageInstance('test', function (err, store) {
+      if (err) {
+        return done(err);
+      }
+      storage = store;
+      app = require('../webserver/app')(storage);
+      done();
+    });
+  });
 
+  before(function (done) {
     server = app.listen(PORT, function () {
       if (server.address()) {
         console.log('starting server in port ' + PORT);
