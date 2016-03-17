@@ -3,16 +3,17 @@ var program = require('commander');
 
 function run(program, cb){
   var env = program.env || 'development';
-  var storage = storageFactory.getStorageInstance(env);
-  if (!storage){
-    return cb('Invalid storage');
-  }
-  storage.getServices({}, function(err, services){
-    services.forEach(function(s){
-      console.log(s.id, s.name, s.url, s.interval);
+  storageFactory.getStorageInstance(env, function(err, storage) {
+    if (err){
+      return cb('Invalid storage');
+    }
+    storage.getServices({}, function(err, services){
+      services.forEach(function(s){
+        console.log(s.id, s.name, s.url, s.interval);
+      });
+      storage.quit();
+      cb();
     });
-    storage.quit();
-    cb();
   });
 }
 

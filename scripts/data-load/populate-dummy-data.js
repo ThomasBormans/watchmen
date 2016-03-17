@@ -60,49 +60,49 @@ function run(programOptions, callback) {
   }
 
   var env = programOptions.env || 'development';
-  var storage = storageFactory.getStorageInstance(env);
-  if (!storage) {
-    console.error('Not available storage for the provided environment ' + env);
-    return;
-  }
+  storageFactory.getStorageInstance(env, function(err, storage) {
+    if (err) {
+      console.error('Not available storage for the provided environment ' + env);
+      return;
+    }
 
-  watchmen = new watchmenFactory(null, storage);
+    watchmen = new watchmenFactory(null, storage);
 
-  storage.flush_database(function () {
+    storage.flush_database(function () {
 
-    debug('database flushed');
+      debug('database flushed');
 
-    clock = sinon.useFakeTimers(initialTime);
+      clock = sinon.useFakeTimers(initialTime);
 
-    populator.populate(services, storage, function (err) {
-      if (err) {
-        return callback(err);
-      }
-
-      debug('services populated');
-
-      storage.getServices({}, function (err, services) {
+      populator.populate(services, storage, function (err) {
         if (err) {
           return callback(err);
         }
 
-        if (programOptions.filter) {
-          services = services.filter(function (s) {
-            return s.name.indexOf(programOptions.filter) > -1;
+        debug('services populated');
+
+        storage.getServices({}, function (err, services) {
+          if (err) {
+            return callback(err);
+          }
+
+          if (programOptions.filter) {
+            services = services.filter(function (s) {
+              return s.name.indexOf(programOptions.filter) > -1;
+            });
+          }
+
+          services.sort(function (a, b) {
+            return a.name > b.name;
           });
-        }
 
-        services.sort(function (a, b) {
-          return a.name > b.name;
+          debug('program started');
+
+          populatedata(services, function(err){
+            storage.quit();
+            callback(err);
+          });
         });
-
-        debug('program started');
-
-        populatedata(services, function(err){
-          storage.quit();
-          callback(err);
-        });
-
       });
     });
   });
