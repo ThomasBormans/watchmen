@@ -20,7 +20,7 @@ describe('service route', function () {
 
   var API_ROOT = '/api';
 
-  var agent = request.agent(app);
+  var agent;
   var validService;
 
   before(function (done) {
@@ -30,6 +30,7 @@ describe('service route', function () {
       }
       storage = store;
       app = require('../webserver/app')(storage);
+      agent = request.agent(app);
       done();
     });
   });

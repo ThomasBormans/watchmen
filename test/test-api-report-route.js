@@ -20,8 +20,7 @@ describe('report route', function () {
   ];
 
   var API_ROOT = '/api/report';
-
-  var agent = request.agent(app);
+  var agent;
 
   before(function (done) {
     var storage = storageFactory.getStorageInstance('test', function (err, store) {
@@ -30,6 +29,7 @@ describe('report route', function () {
       }
       storage = store;
       app = require('../webserver/app')(storage);
+      agent = request.agent(app);
       done();
     });
   });
