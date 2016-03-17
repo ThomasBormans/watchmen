@@ -15,7 +15,7 @@ describe('reporting', function () {
 
   var services;
   var clock;
-  var storage = new redisStorage_class({port: 6666, host: '127.0.0.1', db: 0});
+  var storage;
   var reporter;
   var INITIAL_TIME = 946684800000;
 
@@ -42,6 +42,13 @@ describe('reporting', function () {
 
     async.eachSeries(outageData, addOutage, callback);
   }
+
+  before(function (done) {
+    new redisStorage_class({port: 6666, host: '127.0.0.1', db: 0}, function(err, store) {
+      storage = store;
+      done(err);
+    })
+  });
 
   beforeEach(function (done) {
 
