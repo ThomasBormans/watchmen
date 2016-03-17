@@ -10,8 +10,7 @@ describe('ping plugins route', function () {
   var PORT = 3355;
 
   var API_ROOT = '/api/plugins';
-
-  var agent = request.agent(app);
+  var agent;
 
   before(function (done) {
     var storage = storageFactory.getStorageInstance('test', function (err, store) {
@@ -20,6 +19,7 @@ describe('ping plugins route', function () {
       }
       storage = store;
       app = require('../webserver/app')(storage);
+      agent = request.agent(app);
       done();
     });
   });
