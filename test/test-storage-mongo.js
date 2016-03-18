@@ -3,19 +3,15 @@ var async = require('async');
 var sinon = require('sinon');
 
 var mongo =  require ('../lib/storage/providers/mongo');
+var mongoStorage;
+new mongo({url: 'mongodb://localhost:27017/watchmen-test'}, function(err, storage) {
+  mongoStorage = storage;
+});
 
 describe('mongo storage', function(){
   var service;
   var clock;
   var INITIAL_TIME = 946684800;
-  var mongoStorage;
-
-  before(function(done) {
-    new mongo({url: 'mongodb://localhost:27017/watchmen-test'}, function(err, storage) {
-      mongoStorage = storage;
-      done(err);
-    });
-  });
 
   beforeEach(function(done){
     clock = sinon.useFakeTimers(INITIAL_TIME);
