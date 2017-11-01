@@ -6,3 +6,6 @@ node_modules/
 .idea/
 webserver/public/bower_components/
 coverage/**
+
+# Actual .env file
+config/.env

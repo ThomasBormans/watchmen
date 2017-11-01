@@ -1,7 +1,7 @@
 module.exports = {
 
   production: {
-    provider : 'redis',
+    provider : process.env.WATCHMEN_PROVIDER,
     options : {
       'redis' : {
         port: process.env.WATCHMEN_REDIS_PORT_PRODUCTION || 1216,
@@ -15,7 +15,7 @@ module.exports = {
   },
 
   development: {
-    provider : 'redis',
+    provider : process.env.WATCHMEN_PROVIDER,
     options : {
       'redis' : {
         port: process.env.WATCHMEN_REDIS_PORT_DEVELOPMENT || 1216,
@@ -29,7 +29,7 @@ module.exports = {
   },
 
   test: {
-    provider : 'redis',
+    provider : process.env.WATCHMEN_PROVIDER,
     options : {
       'redis' : {
         port: process.env.WATCHMEN_REDIS_PORT_TEST || 6666,

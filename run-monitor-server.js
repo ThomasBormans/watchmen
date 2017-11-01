@@ -1,3 +1,7 @@
+var dotenv = require("dotenv");
+dotenv.config({
+  path: "config/.env",
+});
 var colors = require('colors');
 var program = require('commander');
 var pluginLoader = require('./lib/plugin-loader');

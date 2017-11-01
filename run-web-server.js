@@ -1,3 +1,7 @@
+var dotenv = require("dotenv");
+dotenv.config({
+  path: "config/.env",
+});
 var program = require('commander');
 var storageFactory = require ('./lib/storage/storage-factory');
 var config = require('./config/web');
